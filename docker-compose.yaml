@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+
+  web:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  db:
+    image: mongo:4.2
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - bookapp:/data/db
+
+  api:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_URL=mongodb://admin:password@db:27017/bookapp?authSource=admin
+    depends_on:
+      - db
+
+  db_UI: 
+    image: mongo-express:latest
+    ports: 
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME="admin"
+      - ME_CONFIG_MONGODB_ADMINPASSWORD="password"
+      - ME_CONFIG_MONGODB_SERVER="db"
+    depends_on:
+      - db
+
+volumes:
+  bookapp:

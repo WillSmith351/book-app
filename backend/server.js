@@ -7,11 +7,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/book-app', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }).then(() => console.log('MongoDB connecté'))
-    .catch(err => console.error(err));
+const dbURL = process.env.DB_URL || 'mongodb://admin:password@localhost:27017/bookapp';
+
+mongoose.connect(dbURL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connecté'))
+.catch(err => console.error('Erreur de connexion à MongoDB:', err));
 
 app.use('/api', bookRoutes);
 
