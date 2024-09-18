@@ -1,23 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
+  const [books, setBooks] = useState([]);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/api/books")
+      .then((res) => setBooks(res.data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const addBook = () => {
+    axios
+      .post("http://localhost:3001/api/books", { title, author })
+      .then((res) => setBooks([...books, res.data]))
+      .catch((err) => console.error(err));
+  };
+
+  const deleteBook = (id) => {
+    axios
+      .delete(`http://localhost:3001/api/books/${id}`)
+      .then(() => setBooks(books.filter((book) => book._id !== id)))
+      .catch((err) => console.error(err));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Liste des livres</h1>
+
+      <div>
+        <input
+          type="text"
+          placeholder="Titre"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Auteur"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+        <button onClick={addBook}>Ajouter</button>
+      </div>
+
+      <ul>
+        {books.map((book) => (
+          <li key={book._id}>
+            {book.title} - {book.author}
+            <button onClick={() => deleteBook(book._id)}>Supprimer</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
